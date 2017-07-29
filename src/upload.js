@@ -88,6 +88,14 @@ ngFileUpload.service('UploadBase', ['$http', '$q', '$timeout', function ($http, 
     }
 
     function uploadWithAngular() {
+      // Add Content-Range header for chunked uploads
+      if (config._chunkSize) {
+        var _end = config._end;
+        if (_end > config.data.file.size) {
+          _end = config.data.file.size;
+        }
+        config.headers['Content-Range'] = 'bytes '+config._start+'-'+(_end-1)+'/'+config.data.file.size;
+      }
       $http(config).then(function (r) {
           if (resumeSupported && config._chunkSize && !config._finished && config._file) {
             var fileSize = config._file && config._file.size || 0;
